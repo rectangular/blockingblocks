@@ -2,6 +2,8 @@ import "CoreLibs/object"
 import "CoreLibs/graphics"
 import "CoreLibs/animation"
 
+import "Utils/rotator"
+
 class('Cursor').extends()
 
 local gfx <const> = playdate.graphics
@@ -13,10 +15,12 @@ function Cursor:init()
 	-- self.blinker.loop = true
 	-- self.blinker:start()
 	self.shape = {
-		{1, 2, 3, 4},
-		{5, 6, 7, 8},
+		{1, 1, 1, 1},
+		{0, 1, 1, 0},
+		{0, 0, 1, 0},
 	}
-	self.debug = true
+	self.flipped = false
+	self.debug = false
 end
 
 function Cursor:printTable(table)
@@ -42,49 +46,14 @@ function Cursor:rotate(shape, clockwise)
 	
 	if clockwise
 	then
-		local left = 1
-		local right = #shape
-		
-		while left < right
-		do
-			for i=1, right - 1
-			do
-				local i = i - 1
-				local top = left
-				local bottom = right
-				
-				-- save the top left corner
-				local topLeft = shape[top][left + i]
-				
-				-- move bottom left into top left
-				local bottomLeft = shape[bottom - i][left]
-				shape[top][left + i] = bottomLeft
-				
-				-- move the bottom right into bottom left
-				local bottomRight = shape[bottom][right - i]
-				shape[bottom - i][left] = bottomRight
-				
-				-- move the top right into bottom right
-				local topRight = shape[top + i][right]
-				shape[bottom][right - i] = topRight
-				
-				-- move the top left into top right
-				shape[top + i][right] = topLeft
-			end
-			right = right - 1
-			left = left + 1
-		end
+		shape = swapXY(shape)
+		shape = flipX(shape)
 	end
-		
-	
-	print("Shape done:")
-	self:printTable2D(shape)
 	
 	return shape
 end
 
 function Cursor:draw(x, y, currentPlayer, rotateClockwise)
-	
 	
 	if rotateClockwise ~= nil
 	then
