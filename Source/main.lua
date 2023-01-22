@@ -54,8 +54,6 @@ local myInputHandlers = {
 	rightButtonUp = function()
 		gd:move_cursor(1, 0)
 	end,
-		
-
 }
 
 -- A function to set up our game environment.
@@ -68,6 +66,15 @@ function myGameSetUp()
 	menu:addMenuItem("Reset game", 
 		function ()
 			gd = GameData(BOARD_SIZE,BOARD_SIZE)
+		end
+	)
+	menu:addMenuItem("Debug", 
+		function ()
+			local debug = nil
+			if gd.debugMode then debug = false else debug = true end
+				
+			board.debugMode = debug
+			gd.debugMode = debug
 		end
 	)
 

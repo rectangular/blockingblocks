@@ -18,6 +18,7 @@ function Board:init(width, height)
 	self.width = width
 	self.height = height
 	self.rotateShape = false
+	self.debugMode = false
 end
 
 function Board:draw(state, player)

@@ -8,6 +8,7 @@ local PLAYER_1 = 1
 local PLAYER_2 = 2
 
 function GameData:init(board_width, board_height)
+	self.debugMode = false
 	self.board_state = {}
 	self.cursor_grid_pos_x = 1
 	self.cursor_grid_pos_y = 1
@@ -23,7 +24,9 @@ function GameData:init(board_width, board_height)
 	end
 	
 	-- set cursor position
-	self.board_state[self.cursor_grid_pos_x][self.cursor_grid_pos_y] = Cursor()
+	local cursor = Cursor()
+	cursor.debugMode = self.debugMode
+	self.board_state[self.cursor_grid_pos_x][self.cursor_grid_pos_y] = cursor
 end
 
 function GameData:move_cursor(delta_grid_x, delta_grid_y)
@@ -81,6 +84,7 @@ function GameData:move_cursor(delta_grid_x, delta_grid_y)
 	
 	-- create new cursor
 	local cursor = Cursor()
+	cursor.debugMode = self.debugMode
 	
 	-- update player position
 	self.cursor_grid_pos_x = new_grid_x
@@ -132,7 +136,9 @@ function GameData:resetCursor()
 		do
 			if self.board_state[x][y] == 0
 			then
-				self.board_state[x][y] = Cursor()
+				local cursor = Cursor()
+				cursor.debugMode = self.debugMode
+				self.board_state[x][y] = cursor
 				self.cursor_grid_pos_x = x
 				self.cursor_grid_pos_y = y
 				return

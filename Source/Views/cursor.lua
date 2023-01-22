@@ -20,7 +20,7 @@ function Cursor:init()
 		{0, 0, 1, 0},
 	}
 	self.flipped = false
-	self.debug = false
+	self.debugMode = false
 end
 
 function Cursor:printTable(table)
@@ -70,7 +70,7 @@ function Cursor:draw(x, y, currentPlayer, rotateClockwise)
 			local pixel_x = CUBE_SIZE*shape_grid_x-CUBE_SIZE+grid_x + 1
 			local pixel_y = CUBE_SIZE*shape_grid_y-CUBE_SIZE+grid_y + 1
 			
-			if self.debug
+			if self.debugMode
 			then
 				-- show numbers
 				gfx.setColor(gfx.kColorBlack)
