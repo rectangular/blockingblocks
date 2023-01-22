@@ -1,7 +1,5 @@
 function swapXY(shape)
 	
-	print("Swapping X -> Y")
-	
 	local newShape = {}
 	
 	for y=#shape, 1, -1
@@ -21,8 +19,6 @@ function swapXY(shape)
 end
 
 function flipX(shape)
-	
-	print("Flipping X")
 	
 	local newShape = {}
 	
