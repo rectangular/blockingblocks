@@ -3,6 +3,7 @@ import "CoreLibs/graphics"
 import "CoreLibs/animation"
 
 import "Utils/rotator"
+import "Data/shape"
 
 class('Cursor').extends()
 
@@ -14,55 +15,19 @@ function Cursor:init()
 	-- self.blinker = gfx.animation.blinker.new()
 	-- self.blinker.loop = true
 	-- self.blinker:start()
-	self.shape = {
+	self.shape = Shape({
 		{1, 1, 1, 1},
 		{0, 1, 1, 0},
 		{0, 0, 1, 0},
-	}
-	self.flipped = false
+	})
 	self.debugMode = false
 end
 
-function Cursor:printTable(table)
-	for x=1, #shape
+function Cursor:draw(x, y, currentPlayer)
+	
+	for shape_grid_y in pairs(self.shape.data)
 	do
-		print(shape[x])
-	end
-end
-
-function Cursor:printTable2D(table)
-	for x=1, #table
-	do
-		printTable(table[x])
-	end
-end
-
-function Cursor:rotate(shape, clockwise)
-	
-	if clockwise == false
-	then
-		return shape
-	end
-	
-	if clockwise
-	then
-		shape = swapXY(shape)
-		shape = flipX(shape)
-	end
-	
-	return shape
-end
-
-function Cursor:draw(x, y, currentPlayer, rotateClockwise)
-	
-	if rotateClockwise ~= nil
-	then
-		self.shape = self:rotate(self.shape, rotateClockwise)
-	end	
-	
-	for shape_grid_y in pairs(self.shape)
-	do
-		for shape_grid_x in pairs(self.shape[shape_grid_y])
+		for shape_grid_x in pairs(self.shape.data[shape_grid_y])
 		do
 			local grid_x = x - (1 * shape_grid_x)
 			local grid_y = y - (1 * shape_grid_y)
@@ -75,10 +40,10 @@ function Cursor:draw(x, y, currentPlayer, rotateClockwise)
 				-- show numbers
 				gfx.setColor(gfx.kColorBlack)
 				gfx.drawRect(pixel_x+2, pixel_y+2, CUBE_SIZE-4, CUBE_SIZE-4)
-				gfx.drawText(self.shape[shape_grid_y][shape_grid_x], pixel_x + 6, pixel_y + 2)
+				gfx.drawText(self.shape.data[shape_grid_y][shape_grid_x], pixel_x + 6, pixel_y + 2)
 			else
 			
-				if self.shape[shape_grid_y][shape_grid_x] == 0
+				if self.shape.data[shape_grid_y][shape_grid_x] == 0
 				then
 					gfx.setColor(gfx.kColorBlack)
 					-- gfx.drawRect(pixel_x+2, pixel_y+2, CUBE_SIZE-4, CUBE_SIZE-4)

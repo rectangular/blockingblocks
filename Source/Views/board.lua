@@ -17,7 +17,6 @@ local CUBE_SIZE = 20 -- this should be dynamic at some point
 function Board:init(width, height)
 	self.width = width
 	self.height = height
-	self.rotateShape = false
 	self.debugMode = false
 end
 
@@ -63,11 +62,14 @@ function Board:draw(state, player)
 				gfx.setColor(gfx.kColorBlack)
 				gfx.fillRect(pixel_x, pixel_y, CUBE_SIZE, CUBE_SIZE)
 			else
-				cube_item:draw(pixel_x, pixel_y, player, self.rotateShape)
+				-- draw cursor
+				cube_item:draw(pixel_x, pixel_y, player)
 			end
 		end
 	end
-	self.rotateShape = false
+	
+	-- draw cursor
+	
 	gfx.popContext()
 end
 

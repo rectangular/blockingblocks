@@ -36,7 +36,6 @@ local myInputHandlers = {
 	end,
 	
 	BButtonDown = function()
-		board.rotateShape = true
 	end,
 
 	downButtonUp = function()
@@ -101,18 +100,11 @@ myGameSetUp()
 -- Use this function to poll input, run game logic, and move sprites.
 
 function playdate.update()
-	-- rotate the transform
-	
-	-- board.shapeRotation = playdate.getCrankChange()
-	
-	-- playerShip.rotate_transform:rotate(playdate.getCrankChange(), playerShip.x, playerShip.y)
-	-- apply the transform to the ship polygon
-	-- playerShip.rotate_transform:transformPolygon(playerShip.polygon)
-	-- reset the transform so that crank change doesn’t accumulate over time
-	-- playerShip.rotate_transform:reset()
 	
 	gfx.sprite.update()
 	playdate.timer.updateTimers()
+	
+	gd:handleCrankInput(playdate.getCrankPosition())
 	
 	gfx.clear(gfx.kColorWhite)
 	board:draw(gd.board_state, gd.currentPlayer)
