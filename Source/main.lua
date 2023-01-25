@@ -110,5 +110,5 @@ function playdate.update()
 	gd:handleCrankInput(playdate.getCrankPosition())
 	
 	gfx.clear(gfx.kColorWhite)
-	board:draw(gd.board_state, gd.cursor, gd.currentPlayer)
+	board:draw(gd.boardState, gd.cursor, gd.currentPlayer)
 end

@@ -9,15 +9,15 @@ local PLAYER_2 = 2
 
 function GameData:init(board_width, board_height)
 	self.debugMode = false
-	self.board_state = {}
+	self.boardState = {}
 	self.currentPlayer = PLAYER_1
 	
 	-- initialize empty board
 	for i = 1, board_width do
-		self.board_state[i] = {}
+		self.boardState[i] = {}
 	
 		for j = 1, board_height do
-			self.board_state[i][j] = 0
+			self.boardState[i][j] = 0
 		end
 	end
 	
@@ -42,12 +42,12 @@ function GameData:move_cursor(delta_grid_x, delta_grid_y)
 		return
 	end
 	
-	if new_grid_x - 1 + self.cursor.shape:width() > #self.board_state
+	if new_grid_x - 1 + self.cursor.shape:width() > #self.boardState
 	then
 		return
 	end
 	
-	if new_grid_y - 1 + self.cursor.shape:height() > #self.board_state[#self.board_state]
+	if new_grid_y - 1 + self.cursor.shape:height() > #self.boardState[#self.boardState]
 	then
 		return
 	end
@@ -56,7 +56,7 @@ function GameData:move_cursor(delta_grid_x, delta_grid_y)
 	-- 
 	--
 	-- another player piece occupies the place
-	-- if self.board_state[new_grid_x][new_grid_y] ~= 0
+	-- if self.boardState[new_grid_x][new_grid_y] ~= 0
 	-- then
 	-- 	print("Can't move into occupied space")
 	-- 	-- move along the same axis additional spaces
@@ -134,16 +134,19 @@ function GameData:placeBlock()
 	self:changePlayer()
 end
 
+function GameData:findCorners()
+end
+
 -- 1 indexed
 function GameData:getBoardDataAt(x, y)
 	print("Get board data at", x, y)
-	return self.board_state[y][x]
+	return self.boardState[y][x]
 end
 
 -- 1 indexed
 function GameData:setBoardDataAt(x, y, data)
 	print("Set board data at", x, y, data)
-	self.board_state[y][x] = data
+	self.boardState[y][x] = data
 end
 
 function GameData:handleCrankInput(angle)
@@ -197,15 +200,15 @@ function GameData:resetCursor()
 	
 	print("TODO: Implement game end check")
 	
-	-- for y in pairs(self.board_state)
+	-- for y in pairs(self.boardState)
 	-- do
-	-- 	for x in pairs(self.board_state[y])
+	-- 	for x in pairs(self.boardState[y])
 	-- 	do
-	-- 		if self.board_state[y][x] == 0
+	-- 		if self.boardState[y][x] == 0
 	-- 		then
 	-- 			self.cursor = Cursor()
 	-- 			self.cursor.debugMode = self.debugMode
-	-- 			self.board_state[y][x] = self.cursor
+	-- 			self.boardState[y][x] = self.cursor
 	-- 			self.cursor_grid_pos_x = x
 	-- 			self.cursor_grid_pos_y = y
 	-- 			return
