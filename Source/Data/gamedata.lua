@@ -10,8 +10,6 @@ local PLAYER_2 = 2
 function GameData:init(board_width, board_height)
 	self.debugMode = false
 	self.board_state = {}
-	self.cursor_grid_pos_x = 1
-	self.cursor_grid_pos_y = 1
 	self.currentPlayer = PLAYER_1
 	
 	-- initialize empty board
@@ -26,13 +24,12 @@ function GameData:init(board_width, board_height)
 	-- set cursor position
 	self.cursor = Cursor()
 	self.cursor.debugMode = self.debugMode
-	self.board_state[self.cursor_grid_pos_x][self.cursor_grid_pos_y] = self.cursor
 end
 
 function GameData:move_cursor(delta_grid_x, delta_grid_y)
 	-- calculate new position
-	local new_grid_x = self.cursor_grid_pos_x + delta_grid_x
-	local new_grid_y = self.cursor_grid_pos_y + delta_grid_y
+	local new_grid_x = self.cursor.gridPosX + delta_grid_x
+	local new_grid_y = self.cursor.gridPosY + delta_grid_y
 	
 	-- test if within bounds
 	if new_grid_x < 1
@@ -82,31 +79,71 @@ function GameData:move_cursor(delta_grid_x, delta_grid_y)
 	-- 	return
 	-- end
 	
-	-- reset old cursor position to 0
-	self.board_state[self.cursor_grid_pos_x][self.cursor_grid_pos_y] = 0
-	
-	-- create new cursor
-	-- TODO: This is likely not required
-	-- self.cursor = Cursor()
-	-- self.cursor.debugMode = self.debugMode
+	-- reset cursor position to 1,1
+	-- self.cursor.gridPosX = 1
+	-- self.cursor.gridPosY = 1
 	
 	-- update player position
-	self.cursor_grid_pos_x = new_grid_x
-	self.cursor_grid_pos_y = new_grid_y
+	self.cursor.gridPosX = new_grid_x
+	self.cursor.gridPosY = new_grid_y
+end
+
+function GameData:checkPlaceBlock()
+	print("Checking if we can place block at:", self.cursor.gridPosX, self.cursor.gridPosY)
 	
-	-- move player to new spot
-	self.board_state[self.cursor_grid_pos_x][self.cursor_grid_pos_y] = self.cursor
+	-- add player cubes to board
+	for y=1, #self.cursor.shape.data
+	do
+		for x=1, #self.cursor.shape.data[y]
+		do
+			-- Only check if we can add piece if shape data is not 0
+			if self.cursor.shape.data[y][x] ~= 0
+			then
+				local data = self:getBoardDataAt(self.cursor.gridPosX + x - 1, self.cursor.gridPosY + y - 1)
+				-- does something already occupy that space?
+				if data ~= 0
+				then
+					print("Can't place block here!")
+					print("Conflict at", self.cursor.gridPosX + x - 1, self.cursor.gridPosY + y - 1)
+					return false
+				end
+			end
+		end
+	end
+	
+	return true
 end
 
 function GameData:placeBlock()
+	print("Placing block at:", self.cursor.gridPosX, self.cursor.gridPosY)
 	
-	print("Placing block at:", self.cursor_grid_pos_x, self.cursor_grid_pos_y)
-	
-	self.board_state[self.cursor_grid_pos_x][self.cursor_grid_pos_y] = self.currentPlayer
-	print("- For player:", self.board_state[self.cursor_grid_pos_x][self.cursor_grid_pos_y])
+	-- add player cubes to board
+	for y=1, #self.cursor.shape.data
+	do
+		for x=1, #self.cursor.shape.data[y]
+		do
+			-- Only add piece if shape data is not 0
+			if self.cursor.shape.data[y][x] ~= 0
+			then
+				self:setBoardDataAt(self.cursor.gridPosX + x - 1, self.cursor.gridPosY + y - 1, self.currentPlayer)
+			end
+		end
+	end
 	
 	self:resetCursor()
 	self:changePlayer()
+end
+
+-- 1 indexed
+function GameData:getBoardDataAt(x, y)
+	print("Get board data at", x, y)
+	return self.board_state[y][x]
+end
+
+-- 1 indexed
+function GameData:setBoardDataAt(x, y, data)
+	print("Set board data at", x, y, data)
+	self.board_state[y][x] = data
 end
 
 function GameData:handleCrankInput(angle)
@@ -153,24 +190,31 @@ end
 
 function GameData:resetCursor()
 	
-	for x in pairs(self.board_state)
-	do
-		for y in pairs(self.board_state[x])
-		do
-			if self.board_state[x][y] == 0
-			then
-				self.cursor = Cursor()
-				self.cursor.debugMode = self.debugMode
-				self.board_state[x][y] = self.cursor
-				self.cursor_grid_pos_x = x
-				self.cursor_grid_pos_y = y
-				return
-			end
-		end
-	end
+	self.cursor = Cursor()
+	self.cursor.debugMode = self.debugMode
+	self.cursor.gridPosX = 1
+	self.cursor.gridPosY = 1
+	
+	print("TODO: Implement game end check")
+	
+	-- for y in pairs(self.board_state)
+	-- do
+	-- 	for x in pairs(self.board_state[y])
+	-- 	do
+	-- 		if self.board_state[y][x] == 0
+	-- 		then
+	-- 			self.cursor = Cursor()
+	-- 			self.cursor.debugMode = self.debugMode
+	-- 			self.board_state[y][x] = self.cursor
+	-- 			self.cursor_grid_pos_x = x
+	-- 			self.cursor_grid_pos_y = y
+	-- 			return
+	-- 		end
+	-- 	end
+	-- end
 	
 	-- if we reach here, no spots available
-	self:gameOver()
+	-- self:gameOver()
 end
 	
 	

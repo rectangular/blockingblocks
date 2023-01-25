@@ -21,5 +21,7 @@ function BoardUI:draw(player)
 	end
 	gfx.setColor(gfx.kColorBlack)
 	local size = gfx.getTextSize(str)
-	gfx.drawText(str, SCREEN_WIDTH / 2 - size / 2, 20)
+	-- local offsetX = SCREEN_WIDTH / 2 - size / 2
+	local offsetX = SCREEN_WIDTH / 2 + 40
+	gfx.drawText(str, offsetX, 20)
 end

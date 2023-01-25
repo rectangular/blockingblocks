@@ -22,7 +22,7 @@ local gfx <const> = playdate.graphics
 -- Here's our player sprite declaration. We'll scope it to this file because
 -- several functions need to access it.
 
-local BOARD_SIZE = 7
+local BOARD_SIZE = 14
 
 local gd = GameData(BOARD_SIZE,BOARD_SIZE)
 local board = Board(BOARD_SIZE,BOARD_SIZE)
@@ -32,7 +32,10 @@ local myInputHandlers = {
 	AButtonDown = function()
 		-- place block
 		-- if acceptable, next turn
-		gd:placeBlock()
+		if gd:checkPlaceBlock()
+		then
+			gd:placeBlock()
+		end
 	end,
 	
 	BButtonDown = function()
@@ -107,5 +110,5 @@ function playdate.update()
 	gd:handleCrankInput(playdate.getCrankPosition())
 	
 	gfx.clear(gfx.kColorWhite)
-	board:draw(gd.board_state, gd.currentPlayer)
+	board:draw(gd.board_state, gd.cursor, gd.currentPlayer)
 end

@@ -12,7 +12,7 @@ local ui = BoardUI()
 -- Playdate screen is 400x240
 local SCREEN_WIDTH = 400
 local SCREEN_HEIGHT = 240
-local CUBE_SIZE = 20 -- this should be dynamic at some point
+local CUBE_SIZE = 16 -- this should be dynamic at some point
 
 function Board:init(width, height)
 	self.width = width
@@ -20,7 +20,7 @@ function Board:init(width, height)
 	self.debugMode = false
 end
 
-function Board:draw(state, player)
+function Board:draw(state, cursor, player)
 	
 	local offset_x = self:get_px_offset_x()
 	local offset_y = self:get_px_offset_y()
@@ -30,51 +30,50 @@ function Board:draw(state, player)
 	ui:draw(player)
 		
 	-- draw the background grid
-	for x in pairs(state)
+	for y in pairs(state)
 	do
-		for y in pairs(state[x])
+		for x in pairs(state[y])
 		do
 			-- overlap by 1px so there isn't a double pixel border
-			local grid_x = offset_x - (1 * x)
-			local grid_y = offset_y - (1 * y)
+			local grid_x = offset_x - x
+			local grid_y = offset_y - y
 			
 			local pixel_x = CUBE_SIZE*x-CUBE_SIZE+grid_x
 			local pixel_y = CUBE_SIZE*y-CUBE_SIZE+grid_y
 			
-			local cube_item = state[x][y]
+			local cube_item = state[y][x]
 			
 			gfx.setColor(gfx.kColorBlack)
 			gfx.drawRect(pixel_x, pixel_y, CUBE_SIZE, CUBE_SIZE)
 			
 			if cube_item == 0
 			then
-				-- do nothing
+				-- do nothing; blank space
 			elseif cube_item == 1 
 			then
-				-- draw player 1 cube
+				-- draw player 1 cube on board
 				gfx.setPattern({ 0xaa, 0x55, 0xaa, 0x55, 0xaa, 0x55, 0xaa, 0x55 })
 				gfx.fillRect(pixel_x, pixel_y, CUBE_SIZE, CUBE_SIZE)
 				gfx.setColor(gfx.kColorBlack)
 				gfx.drawRect(pixel_x, pixel_y, CUBE_SIZE, CUBE_SIZE)
 			elseif cube_item == 2
 			then
-				-- draw player 2 cube
+				-- draw player 2 cube on board
 				gfx.setColor(gfx.kColorBlack)
 				gfx.fillRect(pixel_x, pixel_y, CUBE_SIZE, CUBE_SIZE)
-			else
-				-- draw cursor
-				cube_item:draw(pixel_x, pixel_y, player)
 			end
 		end
 	end
 	
 	-- draw cursor
+	cursor:draw(offset_x, offset_y, player)
 	
 	gfx.popContext()
 end
 
 function Board:get_px_offset_x()
-	return (SCREEN_WIDTH - self:get_px_width()) / 2
+	-- return (SCREEN_WIDTH - self:get_px_width()) / 2
+	return 16
 end
 
 function Board:get_px_offset_y()
