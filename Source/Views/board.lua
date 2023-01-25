@@ -20,7 +20,7 @@ function Board:init(width, height)
 	self.debugMode = false
 end
 
-function Board:draw(state, cursor, player)
+function Board:draw(state, cornerMap, cursor, player)
 	
 	local offset_x = self:get_px_offset_x()
 	local offset_y = self:get_px_offset_y()
@@ -61,6 +61,33 @@ function Board:draw(state, cursor, player)
 				-- draw player 2 cube on board
 				gfx.setColor(gfx.kColorBlack)
 				gfx.fillRect(pixel_x, pixel_y, CUBE_SIZE, CUBE_SIZE)
+			end
+		end
+	end
+	
+	-- draw the corners
+	-- draw the background grid
+	if cornerMap ~= nil
+	then
+		for y in pairs(cornerMap.data)
+		do
+			for x in pairs(cornerMap.data[y])
+			do
+				if cornerMap.data[y][x] > 0
+				then
+					-- overlap by 1px so there isn't a double pixel border
+					local grid_x = offset_x - x
+					local grid_y = offset_y - y
+					
+					local pixel_x = CUBE_SIZE*x-CUBE_SIZE+grid_x
+					local pixel_y = CUBE_SIZE*y-CUBE_SIZE+grid_y
+					
+					if cornerMap.data[y][x] == player
+					then
+						gfx.setColor(gfx.kColorBlack)
+						gfx.fillCircleInRect(pixel_x + 6, pixel_y + 6, CUBE_SIZE - 12, CUBE_SIZE - 12)
+					end
+				end
 			end
 		end
 	end

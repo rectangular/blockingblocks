@@ -1,6 +1,7 @@
 import "CoreLibs/object"
 
 import "Views/cursor"
+import "Data/cornermap"
 
 class('GameData').extends()
 
@@ -10,6 +11,7 @@ local PLAYER_2 = 2
 function GameData:init(board_width, board_height)
 	self.debugMode = false
 	self.boardState = {}
+	self.cornerMap = nil
 	self.currentPlayer = PLAYER_1
 	
 	-- initialize empty board
@@ -130,11 +132,13 @@ function GameData:placeBlock()
 		end
 	end
 	
+	-- build corner map
+	self.cornerMap = CornerMap(self.boardState, #self.boardState[1], #self.boardState, self.currentPlayer)
+	
 	self:resetCursor()
 	self:changePlayer()
-end
-
-function GameData:findCorners()
+	
+	
 end
 
 -- 1 indexed
