@@ -17,10 +17,14 @@ function Cursor:init()
 	-- self.blinker = gfx.animation.blinker.new()
 	-- self.blinker.loop = true
 	-- self.blinker:start()
+	-- self.shape = Shape({
+	-- 	{1, 1, 1, 1},
+	-- 	{0, 1, 1, 0},
+	-- 	{0, 0, 1, 0},
+	-- })
 	self.shape = Shape({
-		{1, 1, 1, 1},
-		{0, 1, 1, 0},
-		{0, 0, 1, 0},
+		{1, 1},
+		{1, 0}
 	})
 	self.debugMode = false
 	self.gridPosX = 1
@@ -75,6 +79,8 @@ function Cursor:draw(boardOffsetX, boardOffsetY, currentPlayer)
 					gfx.fillRect(pixelX+CUBE_INSET, pixelY+CUBE_INSET, CUBE_SIZE-(CUBE_INSET*2), CUBE_SIZE-(CUBE_INSET*2))
 					gfx.setColor(gfx.kColorBlack)
 					gfx.drawRect(pixelX+CUBE_INSET, pixelY+CUBE_INSET, CUBE_SIZE-(CUBE_INSET*2), CUBE_SIZE-(CUBE_INSET*2))
+					gfx.setColor(gfx.kColorWhite)
+					gfx.drawRect(pixelX+2, pixelY+2, CUBE_SIZE-4, CUBE_SIZE-4)
 				end
 			end
 			

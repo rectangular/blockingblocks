@@ -11,8 +11,11 @@ local PLAYER_2 = 2
 function GameData:init(board_width, board_height)
 	self.debugMode = false
 	self.boardState = {}
-	self.cornerMap = nil
 	self.currentPlayer = PLAYER_1
+	self.turnCount = {
+		[1] = 1,
+		[2] = 1
+	}
 	
 	-- initialize empty board
 	for i = 1, board_width do
@@ -25,6 +28,7 @@ function GameData:init(board_width, board_height)
 	
 	-- set cursor position
 	self.cursor = Cursor()
+	self.cornerMap = CornerMap(self.boardState, #self.boardState[1], #self.boardState, self.currentPlayer)
 	self.cursor.debugMode = self.debugMode
 end
 
@@ -90,10 +94,47 @@ function GameData:move_cursor(delta_grid_x, delta_grid_y)
 	self.cursor.gridPosY = new_grid_y
 end
 
-function GameData:checkPlaceBlock()
-	print("Checking if we can place block at:", self.cursor.gridPosX, self.cursor.gridPosY)
+function GameData:findCoordinatesOfShape(originX, originY)
+	-- Takes coordinates and looks at self.cursor.shape.data to
+	-- return a table of coordinates {{x: 8, y: 27}, {x: 9, y: 27}}
 	
-	-- add player cubes to board
+	local coordinates = {}
+	
+	for y=1, #self.cursor.shape.data
+	do
+		for x=1, #self.cursor.shape.data[y]
+		do
+			-- is this part of the shape?
+			if self.cursor.shape.data[y][x] == 1
+			then
+				table.insert(coordinates, {x = originX + x - 1, y = originY + y - 1})
+			end
+		end
+	end
+	
+	return coordinates
+end
+
+function GameData:checkPlaceBlockAtCursorPosition()
+	return self:checkPlaceBlock(self.cursor.gridPosX, self.cursor.gridPosY)
+end
+
+function GameData:checkPlaceBlock(gridPosX, gridPosY)
+	print("Checking if we can place block at:", gridPosX, gridPosY)
+	
+	-- check if player controls any of the squares where they are trying to place the block
+	-- but they can place anywhere on turn 1
+	if self.turnCount[self.currentPlayer] > 1
+	then
+		local shapeCoordinates = self:findCoordinatesOfShape(gridPosX, gridPosY)
+		if self.cornerMap:checkPlayerMapControl(self.currentPlayer, shapeCoordinates) == false
+		then
+			-- player doesn't control any of these squares, return false
+			return false
+		end
+	end
+	
+	-- check if legal place to place block
 	for y=1, #self.cursor.shape.data
 	do
 		for x=1, #self.cursor.shape.data[y]
@@ -101,12 +142,12 @@ function GameData:checkPlaceBlock()
 			-- Only check if we can add piece if shape data is not 0
 			if self.cursor.shape.data[y][x] ~= 0
 			then
-				local data = self:getBoardDataAt(self.cursor.gridPosX + x - 1, self.cursor.gridPosY + y - 1)
+				local data = self:getBoardDataAt(gridPosX + x - 1, gridPosY + y - 1)
 				-- does something already occupy that space?
 				if data ~= 0
 				then
 					print("Can't place block here!")
-					print("Conflict at", self.cursor.gridPosX + x - 1, self.cursor.gridPosY + y - 1)
+					print("Conflict at", gridPosX + x - 1, gridPosY + y - 1)
 					return false
 				end
 			end
@@ -135,10 +176,25 @@ function GameData:placeBlock()
 	-- build corner map
 	self.cornerMap = CornerMap(self.boardState, #self.boardState[1], #self.boardState, self.currentPlayer)
 	
+	-- reset cursor
 	self:resetCursor()
+	-- change player
 	self:changePlayer()
-	
-	
+end
+
+function GameData:checkIfAnyMoves()
+	-- checking if there's any moves available for the player
+	for y=1, #self.boardState
+	do
+		for x=1, #self.boardState[y]
+		do
+			if self:checkPlaceBlock(x, y) == true
+			then
+				return true
+			end
+		end
+	end
+	return false
 end
 
 -- 1 indexed
@@ -180,6 +236,9 @@ function GameData:changePlayer()
 		return
 	end
 	
+	-- increase player turn completed count
+	self.turnCount[self.currentPlayer] = self.turnCount[self.currentPlayer] + 1
+	
 	if self.currentPlayer == PLAYER_1
 	then
 		self.currentPlayer = PLAYER_2
@@ -187,7 +246,7 @@ function GameData:changePlayer()
 		self.currentPlayer = PLAYER_1
 	end
 	
-	print("Changed to", self.currentPlayer)
+	print("Changed to", self.currentPlayer, "starting turn number", self.turnCount[self.currentPlayer] + 1)
 end
 
 function GameData:gameOver()
@@ -196,33 +255,17 @@ function GameData:gameOver()
 end
 
 function GameData:resetCursor()
+	print("Checking if there's any moves left")
+	if self:checkIfAnyMoves() == false
+	then
+		print("!!!! GAME OVER !!!!")
+		self:gameOver()
+		return
+	end
 	
 	self.cursor = Cursor()
 	self.cursor.debugMode = self.debugMode
 	self.cursor.gridPosX = 1
 	self.cursor.gridPosY = 1
-	
-	print("TODO: Implement game end check")
-	
-	-- for y in pairs(self.boardState)
-	-- do
-	-- 	for x in pairs(self.boardState[y])
-	-- 	do
-	-- 		if self.boardState[y][x] == 0
-	-- 		then
-	-- 			self.cursor = Cursor()
-	-- 			self.cursor.debugMode = self.debugMode
-	-- 			self.boardState[y][x] = self.cursor
-	-- 			self.cursor_grid_pos_x = x
-	-- 			self.cursor_grid_pos_y = y
-	-- 			return
-	-- 		end
-	-- 	end
-	-- end
-	
-	-- if we reach here, no spots available
-	-- self:gameOver()
 end
-	
-	
 	

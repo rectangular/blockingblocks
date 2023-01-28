@@ -27,7 +27,7 @@ function Board:draw(state, cornerMap, cursor, player)
 	
 	gfx.pushContext()
 	
-	ui:draw(player)
+	ui:draw(player, cornerMap)
 		
 	-- draw the background grid
 	for y in pairs(state)

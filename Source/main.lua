@@ -22,7 +22,7 @@ local gfx <const> = playdate.graphics
 -- Here's our player sprite declaration. We'll scope it to this file because
 -- several functions need to access it.
 
-local BOARD_SIZE = 14
+local BOARD_SIZE = 7
 
 local gd = GameData(BOARD_SIZE,BOARD_SIZE)
 local board = Board(BOARD_SIZE,BOARD_SIZE)
@@ -30,9 +30,15 @@ local board = Board(BOARD_SIZE,BOARD_SIZE)
 local myInputHandlers = {
 
 	AButtonDown = function()
-		-- place block
-		-- if acceptable, next turn
-		if gd:checkPlaceBlock()
+		-- check if game over
+		-- TODO: better game over state
+		if gd.currentPlayer == nil
+		then
+			return
+		end
+		
+		-- check if you can place a block
+		if gd:checkPlaceBlockAtCursorPosition()
 		then
 			gd:placeBlock()
 		end

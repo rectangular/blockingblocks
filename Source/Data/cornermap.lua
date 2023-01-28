@@ -13,6 +13,10 @@ function CornerMap:init(inputData, sizeX, sizeY, currentPlayer)
 	self.inputData = inputData
 	self.currentPlayer = currentPlayer
 	self.data = self:createBlankCornerData(sizeX, sizeY)
+	self.controlled = {
+		[PLAYER_1] = 0,
+		[PLAYER_2] = 0,
+	}
 	self:constructMap()
 end
 
@@ -52,9 +56,9 @@ function CornerMap:markAdjacentPiece(x, y, piecePlayer)
 		then
 			print("setting x, y to", x, y, piecePlayer)
 			self.data[y][x] = piecePlayer
+			self.controlled[piecePlayer] = self.controlled[piecePlayer] + 1
 		end
 	end
-	
 end
 
 function CornerMap:constructMap()
@@ -78,26 +82,6 @@ function CornerMap:constructMap()
 					for adjX=-1, 1
 					do
 						self:markAdjacentPiece(x + adjX, y + adjY, squareData)
-						-- local posX = x + adjX
-						-- local posY = y + adjY
-						-- 
-						-- if adjY == 0
-						-- then
-						-- 	-- NOT eligible spot
-						-- 	outputData[posY][posX] = -1
-						-- elseif adjX == 0
-						-- then
-						-- 	-- NOT eligible spot
-						-- 	outputData[posY][posX] = -1
-						-- elseif posX <= #inputData[1] and posY <= #inputData and posX >= 1 and posY >= 1
-						-- then
-						-- 	-- eligible place
-						-- 	local adjData = inputData[posY][posX]
-						-- 	if adjData == 0
-						-- 	then
-						-- 		outputData[posY][posX] = self.currentPlayer
-						-- 	end
-						-- end
 					end
 				end
 				
@@ -108,59 +92,22 @@ function CornerMap:constructMap()
 	
 end
 
--- archive below
-function CornerMap:createCornerMap(inputData, sizeX, sizeY)
-	
-	local outputData = self:createBlankCornerData(sizeX, sizeY)
-	local prevDataX = nil
-	
-	for y=1, sizeY
+-- Return true a player controls any of these coordinates; otherwise return false
+function CornerMap:checkPlayerMapControl(player, coordinates)
+	-- coordinates is table of coordinates {{x: 8, y: 27}, {x: 9, y: 27}}
+	for i=1, #coordinates
 	do
-		for x=1, sizeX
-		do
-			-- find open corners
-			-- check if spot is occupied and eligible to be a matched corner
-			local data = inputData[y][x]
-			
-			if data ~= 0 and data ~= nil
+		local coords = coordinates[i]
+		printTable("COORDS", coords)
+		if coords.x <= self.sizeX and coords.y <= self.sizeY
+		then
+			if self.data[coords.y][coords.x] == player
 			then
-				-- nearby spaces are empty
-				-- check all adjacent squares
-				-- -1,-1 -> 1,1
-				
-				for adjY=-1, 1
-				do
-					for adjX=-1, 1
-					do
-						local posX = x + adjX
-						local posY = y + adjY
-						
-						if adjY == 0
-						then
-							-- NOT eligible spot
-							outputData[posY][posX] = -1
-						elseif adjX == 0
-						then
-							-- NOT eligible spot
-							outputData[posY][posX] = -1
-						elseif posX <= #inputData[1] and posY <= #inputData and posX >= 1 and posY >= 1
-						then
-							-- eligible place
-							local adjData = inputData[posY][posX]
-							if adjData == 0
-							then
-								outputData[posY][posX] = self.currentPlayer
-							end
-						end
-					end
-				end
-				
+				return true
 			end
-			
-			prevDataX = data
-			
 		end
 	end
 	
-	return outputData
+	print("No overlap found with player controlled squares")
+	return false
 end
