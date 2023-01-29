@@ -32,7 +32,7 @@ local myInputHandlers = {
 	AButtonDown = function()
 		-- check if game over
 		-- TODO: better game over state
-		if gd.currentPlayer == nil
+		if gd.gameIsRunning == false
 		then
 			return
 		end
@@ -116,5 +116,5 @@ function playdate.update()
 	gd:handleCrankInput(playdate.getCrankPosition())
 	
 	gfx.clear(gfx.kColorWhite)
-	board:draw(gd.boardState, gd.cornerMap, gd.cursor, gd.currentPlayer)
+	board:draw(gd.boardState, gd.gameIsRunning, gd.cornerMap, gd.cursor, gd.currentPlayer)
 end

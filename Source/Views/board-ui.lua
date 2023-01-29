@@ -11,16 +11,16 @@ local SCREEN_HEIGHT = 240
 function BoardUI:init()
 end
 
-function BoardUI:draw(player, cornerMap)
+function BoardUI:draw(gameIsRunning, player, cornerMap)
 	local str = ""
-	if player == nil
+	if gameIsRunning == false
 	then
 		str = "GAME OVER"
 	else
 		str = "Player " .. player .. " turn"
 	end
 	
-	if cornerMap ~= nil and player ~= nil
+	if cornerMap ~= nil
 	then
 		str = str .. "\n\n" .. "Open: " .. cornerMap.controlled[player]
 	end

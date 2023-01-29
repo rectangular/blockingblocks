@@ -20,14 +20,14 @@ function Board:init(width, height)
 	self.debugMode = false
 end
 
-function Board:draw(state, cornerMap, cursor, player)
+function Board:draw(state, gameIsRunning, cornerMap, cursor, player)
 	
 	local offset_x = self:get_px_offset_x()
 	local offset_y = self:get_px_offset_y()
 	
 	gfx.pushContext()
 	
-	ui:draw(player, cornerMap)
+	ui:draw(gameIsRunning, player, cornerMap)
 		
 	-- draw the background grid
 	for y in pairs(state)

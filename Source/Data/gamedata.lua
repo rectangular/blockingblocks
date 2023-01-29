@@ -10,6 +10,7 @@ local PLAYER_2 = 2
 
 function GameData:init(board_width, board_height)
 	self.debugMode = false
+	self.gameIsRunning = true	-- potentially refactor to gameWinner = nil?
 	self.boardState = {}
 	self.currentPlayer = PLAYER_1
 	self.turnCount = {
@@ -119,8 +120,28 @@ function GameData:checkPlaceBlockAtCursorPosition()
 	return self:checkPlaceBlock(self.cursor.gridPosX, self.cursor.gridPosY)
 end
 
+function GameData:checkWithinBounds(gridPosX, gridPosY)
+	
+	if gridPosY + #self.cursor.shape.data - 1 > #self.boardState
+	then
+		return false
+	end
+	
+	-- check if within board space
+	if gridPosX + #self.cursor.shape.data[1] - 1 > #self.boardState[1]
+	then
+		return false
+	end
+	
+	return true
+end
+
 function GameData:checkPlaceBlock(gridPosX, gridPosY)
-	print("Checking if we can place block at:", gridPosX, gridPosY)
+	
+	if self:checkWithinBounds(gridPosX, gridPosY) == false
+	then
+		return false
+	end
 	
 	-- check if player controls any of the squares where they are trying to place the block
 	-- but they can place anywhere on turn 1
@@ -146,8 +167,6 @@ function GameData:checkPlaceBlock(gridPosX, gridPosY)
 				-- does something already occupy that space?
 				if data ~= 0
 				then
-					print("Can't place block here!")
-					print("Conflict at", gridPosX + x - 1, gridPosY + y - 1)
 					return false
 				end
 			end
@@ -176,36 +195,44 @@ function GameData:placeBlock()
 	-- build corner map
 	self.cornerMap = CornerMap(self.boardState, #self.boardState[1], #self.boardState, self.currentPlayer)
 	
-	-- reset cursor
-	self:resetCursor()
 	-- change player
 	self:changePlayer()
+	
+	-- reset cursor
+	self:resetCursor()
+
 end
 
 function GameData:checkIfAnyMoves()
 	-- checking if there's any moves available for the player
-	for y=1, #self.boardState
+	
+	-- rotate block
+	for i=1, 4
 	do
-		for x=1, #self.boardState[y]
+	
+		for y=1, #self.boardState
 		do
-			if self:checkPlaceBlock(x, y) == true
-			then
-				return true
+			for x=1, #self.boardState[y]
+			do
+				if self:checkPlaceBlock(x, y) == true
+				then
+					return true
+				end
 			end
 		end
+		
+		self.cursor.shape:rotateCW()
 	end
 	return false
 end
 
 -- 1 indexed
 function GameData:getBoardDataAt(x, y)
-	print("Get board data at", x, y)
 	return self.boardState[y][x]
 end
 
 -- 1 indexed
 function GameData:setBoardDataAt(x, y, data)
-	print("Set board data at", x, y, data)
 	self.boardState[y][x] = data
 end
 
@@ -251,21 +278,23 @@ end
 
 function GameData:gameOver()
 	print("game over!")
-	self.currentPlayer = nil
+	self.gameIsRunning = false
 end
 
 function GameData:resetCursor()
-	print("Checking if there's any moves left")
+	
+	self.cursor = Cursor()
+	self.cursor.debugMode = self.debugMode
+	self.cursor.gridPosX = 1
+	self.cursor.gridPosY = 1
+	
+	print("Checking if there's any moves left…")
 	if self:checkIfAnyMoves() == false
 	then
 		print("!!!! GAME OVER !!!!")
 		self:gameOver()
 		return
 	end
-	
-	self.cursor = Cursor()
-	self.cursor.debugMode = self.debugMode
-	self.cursor.gridPosX = 1
-	self.cursor.gridPosY = 1
+	print("there are moves left!")
 end
 	

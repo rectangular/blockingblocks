@@ -49,12 +49,10 @@ function CornerMap:markAdjacentPiece(x, y, piecePlayer)
 	
 	if self:inBounds(x, y, #self.inputData[1], #self.inputData)
 	then
-		print("in bounds")
 		-- eligible place
 		local adjData = self.inputData[y][x]
 		if adjData == 0
 		then
-			print("setting x, y to", x, y, piecePlayer)
 			self.data[y][x] = piecePlayer
 			self.controlled[piecePlayer] = self.controlled[piecePlayer] + 1
 		end
@@ -98,7 +96,6 @@ function CornerMap:checkPlayerMapControl(player, coordinates)
 	for i=1, #coordinates
 	do
 		local coords = coordinates[i]
-		printTable("COORDS", coords)
 		if coords.x <= self.sizeX and coords.y <= self.sizeY
 		then
 			if self.data[coords.y][coords.x] == player
@@ -108,6 +105,5 @@ function CornerMap:checkPlayerMapControl(player, coordinates)
 		end
 	end
 	
-	print("No overlap found with player controlled squares")
 	return false
 end
