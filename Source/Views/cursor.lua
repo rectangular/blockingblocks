@@ -9,7 +9,7 @@ class('Cursor').extends()
 
 local gfx <const> = playdate.graphics
 
-local CUBE_SIZE = 16
+local CUBE_SIZE = 16 * 2
 local CUBE_INSET = 3
 local CUBE_ELEVATION = 0
 

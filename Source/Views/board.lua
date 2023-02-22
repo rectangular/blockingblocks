@@ -12,7 +12,7 @@ local ui = BoardUI()
 -- Playdate screen is 400x240
 local SCREEN_WIDTH = 400
 local SCREEN_HEIGHT = 240
-local CUBE_SIZE = 16 -- this should be dynamic at some point
+local CUBE_SIZE = 16 * 2 -- this should be dynamic at some point
 
 function Board:init(width, height)
 	self.width = width
@@ -20,14 +20,14 @@ function Board:init(width, height)
 	self.debugMode = false
 end
 
-function Board:draw(state, gameIsRunning, cornerMap, cursor, player)
+function Board:draw(state, gameWinner, cornerMap, cursor, player)
 	
 	local offset_x = self:get_px_offset_x()
 	local offset_y = self:get_px_offset_y()
 	
 	gfx.pushContext()
 	
-	ui:draw(gameIsRunning, player, cornerMap)
+	ui:draw(gameWinner, player, cornerMap)
 		
 	-- draw the background grid
 	for y in pairs(state)

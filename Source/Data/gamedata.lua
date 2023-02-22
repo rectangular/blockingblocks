@@ -10,7 +10,7 @@ local PLAYER_2 = 2
 
 function GameData:init(board_width, board_height)
 	self.debugMode = false
-	self.gameIsRunning = true	-- potentially refactor to gameWinner = nil?
+	self.gameWinner = nil
 	self.boardState = {}
 	self.currentPlayer = PLAYER_1
 	self.turnCount = {
@@ -58,37 +58,6 @@ function GameData:move_cursor(delta_grid_x, delta_grid_y)
 	then
 		return
 	end
-	
-	-- TODO: Refactor piece obstruction
-	-- 
-	--
-	-- another player piece occupies the place
-	-- if self.boardState[new_grid_x][new_grid_y] ~= 0
-	-- then
-	-- 	print("Can't move into occupied space")
-	-- 	-- move along the same axis additional spaces
-	-- 	if delta_grid_x ~= 0
-	-- 	then
-	-- 		if delta_grid_x > 0
-	-- 		then
-	-- 			self:move_cursor(delta_grid_x+1, 0)
-	-- 		else
-	-- 			self:move_cursor(delta_grid_x-1, 0)
-	-- 		end
-	-- 	else
-	-- 		if delta_grid_y > 0
-	-- 		then
-	-- 			self:move_cursor(0, delta_grid_y+1)
-	-- 		else
-	-- 			self:move_cursor(0, delta_grid_y-1)
-	-- 		end
-	-- 	end
-	-- 	return
-	-- end
-	
-	-- reset cursor position to 1,1
-	-- self.cursor.gridPosX = 1
-	-- self.cursor.gridPosY = 1
 	
 	-- update player position
 	self.cursor.gridPosX = new_grid_x
@@ -191,16 +160,33 @@ function GameData:placeBlock()
 			end
 		end
 	end
-	
+end
+
+function GameData:endTurn()
 	-- build corner map
 	self.cornerMap = CornerMap(self.boardState, #self.boardState[1], #self.boardState, self.currentPlayer)
 	
 	-- change player
 	self:changePlayer()
 	
+	-- see if there's any moves left
+	-- if not, end the game
+	print("Checking if there's any moves left…")
+	if self:checkIfAnyMoves() == false
+	then
+		print("!!!! GAME OVER !!!!")
+		if self.currentPlayer == PLAYER_1
+		then
+			self:gameOver(PLAYER_2)
+		else
+			self:gameOver(PLAYER_1)
+		end
+		return
+	end
+	print("there are still moves left!")
+	
 	-- reset cursor
 	self:resetCursor()
-
 end
 
 function GameData:checkIfAnyMoves()
@@ -257,12 +243,6 @@ end
 
 function GameData:changePlayer()
 	
-	-- don't overwrite game over state
-	if self.currentPlayer == nil
-	then
-		return
-	end
-	
 	-- increase player turn completed count
 	self.turnCount[self.currentPlayer] = self.turnCount[self.currentPlayer] + 1
 	
@@ -276,25 +256,15 @@ function GameData:changePlayer()
 	print("Changed to", self.currentPlayer, "starting turn number", self.turnCount[self.currentPlayer] + 1)
 end
 
-function GameData:gameOver()
-	print("game over!")
-	self.gameIsRunning = false
+function GameData:gameOver(winner)
+	print("Game over! Winner is", winner)
+	self.gameWinner = winner
 end
 
 function GameData:resetCursor()
-	
 	self.cursor = Cursor()
 	self.cursor.debugMode = self.debugMode
 	self.cursor.gridPosX = 1
 	self.cursor.gridPosY = 1
-	
-	print("Checking if there's any moves left…")
-	if self:checkIfAnyMoves() == false
-	then
-		print("!!!! GAME OVER !!!!")
-		self:gameOver()
-		return
-	end
-	print("there are moves left!")
 end
 	
