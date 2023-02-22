@@ -6,6 +6,7 @@ local NOT_CORNER = -1
 local NOT_DETERMINED = 0
 local PLAYER_1 = 1
 local PLAYER_2 = 2
+local BOTH_CONTROL = 99
 
 function CornerMap:init(inputData, sizeX, sizeY, currentPlayer)
 	self.sizeX = sizeX
@@ -18,6 +19,14 @@ function CornerMap:init(inputData, sizeX, sizeY, currentPlayer)
 		[PLAYER_2] = 0,
 	}
 	self:constructMap()
+end
+
+function CornerMap:getOtherPlayer(player)
+	if player == PLAYER_1
+	then
+		return PLAYER_2
+	end
+	return PLAYER_1
 end
 
 function CornerMap:createBlankCornerData(sizeX, sizeY)
@@ -51,8 +60,11 @@ function CornerMap:markAdjacentPiece(x, y, piecePlayer)
 	then
 		-- eligible place
 		local adjData = self.inputData[y][x]
+		
+		-- if the square is blank
 		if adjData == 0
 		then
+			-- eligible for placement if it's unowned
 			self.data[y][x] = piecePlayer
 			self.controlled[piecePlayer] = self.controlled[piecePlayer] + 1
 		end
@@ -72,9 +84,10 @@ function CornerMap:constructMap()
 			if squareData ~= 0 and squareData ~= nil
 			then
 				-- nearby spaces are empty
-				-- check all adjacent squares
+				-- mark all adjacent squares
 				-- -1,-1 -> 1,1
 				
+				-- TODO: Check if there's an opponent piece in this area
 				for adjY=-1, 1
 				do
 					for adjX=-1, 1
